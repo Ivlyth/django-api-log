@@ -5,7 +5,7 @@ Django reusable app for record request/response information to database for aler
 
 
 ### Installation
-`pip install django_api_log`
+`pip install django-api-log`
 
 ### Usage.
 
