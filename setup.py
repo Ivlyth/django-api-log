@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django_api_log',
-    version='0.1.1',
+    version='0.1.2',
     packages=['django_api_log', 'django_api_log.migrations'],
     url='https://github.com/MythRen/django-api-log',
     license='BSD',
