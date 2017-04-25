@@ -56,7 +56,7 @@ def query_api_log(request):
     page = query_data.get(u'page', 1)
     try:
         q_page = int(page)
-        q_page = min(q_page, 1)  # page can not less than 1
+        q_page = max(q_page, 1)  # page can not less than 1
     except ValueError:
         return BadRequestResponse(u'invalid page number: %s, should be a integer value' % page)
 
