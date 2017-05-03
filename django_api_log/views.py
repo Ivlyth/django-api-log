@@ -207,8 +207,8 @@ def view_api_response(request, log_id):
     if not log:
         return JsonResponse({u'detail': u'log id does not exist'})
 
-    from_ = request.GET.get('from', '')
-    if from_ == 'django':
+    format_ = request.GET.get('format', '')
+    if format_ == 'format':
         response_body = log.django_error_page if log.django_error_page else log.response_body
     else:
         response_body = log.response_body
