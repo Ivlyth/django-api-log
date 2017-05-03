@@ -89,7 +89,7 @@ class ApiLog(BaseModel):
             reverse('%s:%s' % (DjangoApiLogConfig.name, 'view_api_data'), args=(self.id,)))
         data['response_url'] = request.build_absolute_uri(
             reverse('%s:%s' % (DjangoApiLogConfig.name, 'view_api_response'), args=(self.id,)))
-        data['django_error_page_url'] = u'%s?from=django' % request.build_absolute_uri(
+        data['django_error_page_url'] = u'%s?format=django' % request.build_absolute_uri(
             reverse('%s:%s' % (DjangoApiLogConfig.name, 'view_api_response'), args=(self.id,)))
         return data
 
