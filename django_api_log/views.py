@@ -180,6 +180,20 @@ def query_api_log(request):
     })
 
 
+def view_api_data(request, log_id):
+    '''
+    view full data for special log
+    :param request: current request instance
+    :param log_id: special log id
+    :return:
+    '''
+    request.__NO_LOG__ = True
+    log = ApiLog.objects.filter(pk=log_id).first()
+    if not log:
+        return JsonResponse({u'detail': u'log id does not exist'})
+    return JsonResponse(log.json(request))
+
+
 def view_api_response(request, log_id):
     '''
     only view response for special log
@@ -193,9 +207,13 @@ def view_api_response(request, log_id):
     if not log:
         return JsonResponse({u'detail': u'log id does not exist'})
 
-    response_body = log.response_body
+    from_ = request.GET.get('from', '')
+    if from_ == 'django':
+        response_body = log.django_error_page if log.django_error_page else log.response_body
+    else:
+        response_body = log.response_body
     if not response_body:
-        return JsonResponse({u'detail': u'log response body is empty'})
+        return JsonResponse({u'detail': u'<log response body is empty>'})
     if isinstance(response_body, (dict, list)):
         return JsonResponse({
             u'response_body': response_body

@@ -64,8 +64,9 @@ class ApiLog(BaseModel):
     url_name = models.CharField(max_length=100, default='')  # url name
     view_name = models.CharField(max_length=100, default='')  # view name(app_name:url_name)
     func_name = models.CharField(max_length=100, default='')  # function name
-    exception = models.CharField(max_length=100)  # exception name
+    exception = models.TextField(max_length=100)  # exception name
     traceback = models.TextField()  # traceback, if any
+    django_error_page = models.TextField(null=True, blank=True)  # django error page, if http_code == 500
     start_time = models.DateTimeField(auto_now=True)  # request start
     end_time = models.DateTimeField(auto_now_add=True)  # when return response
     duration = models.FloatField()  # last for how long in million seconds
@@ -77,14 +78,19 @@ class ApiLog(BaseModel):
         return self.__repr__()
 
     IGNORE_FIELDS = (
-        'raw_query', 'raw_request_headers', 'raw_request_body', 'raw_response_headers', 'raw_response_body')
+        'raw_query', 'raw_request_headers', 'raw_request_body', 'raw_response_headers', 'raw_response_body', 'django_error_page')
 
     INCLUDE_PROPERTIES = ('query', 'request_headers', 'request_body', 'response_headers', 'response_body')
 
     def json(self, request):
         data = super(ApiLog, self).json()
         # request uesd to build full url on the fly
-        data['response_url'] = request.build_absolute_uri(reverse('%s:%s'%(DjangoApiLogConfig.name, 'view_api_response'), args=(self.id, )))
+        data['data_url'] = request.build_absolute_uri(
+            reverse('%s:%s' % (DjangoApiLogConfig.name, 'view_api_data'), args=(self.id,)))
+        data['response_url'] = request.build_absolute_uri(
+            reverse('%s:%s' % (DjangoApiLogConfig.name, 'view_api_response'), args=(self.id,)))
+        data['django_error_page_url'] = u'%s?from=django' % request.build_absolute_uri(
+            reverse('%s:%s' % (DjangoApiLogConfig.name, 'view_api_response'), args=(self.id,)))
         return data
 
     @property

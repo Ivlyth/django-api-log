@@ -7,10 +7,12 @@ Email  : belongmyth at 163.com
 
 import json
 import logging
+import sys
 import traceback
 
 from datetime import datetime
 from django.urls import resolve, Resolver404
+from django.views import debug
 
 from .models import ApiLog
 from .settings import settings
@@ -114,6 +116,7 @@ class ApiLogMiddleware(object):
             if uncaught_exception:
                 apilog.exception = str(uncaught_exception)
                 apilog.traceback = getattr(request, 'uncaught_exception_format', '')
+                apilog.django_error_page = getattr(request, 'django_error_page', '')
 
             apilog.end_time = datetime.now()
             apilog.duration = round((apilog.end_time - apilog.start_time).total_seconds() * 1000, 2)
@@ -133,3 +136,6 @@ class ApiLogMiddleware(object):
     def process_exception(self, request, exception):
         request.uncaught_exception = exception
         request.uncaught_exception_format = traceback.format_exc()
+        exc_type, exc_value, tb = sys.exc_info()
+        reporter = debug.ExceptionReporter(request, exc_type, exc_value, tb)
+        request.django_error_page = reporter.get_traceback_html()
